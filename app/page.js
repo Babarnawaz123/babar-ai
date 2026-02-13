@@ -6,8 +6,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content:
-        "## Welcome to **BabarGPT**\n\nAsk anything and get clear, well-formatted answers instantly. Fast, intuitive, and always ready to help!."
+      content: "## Welcome to **BabarGPT**\n\nAsk anything and get clear, well-formatted answers instantly. Fast, intuitive, and always ready to help!."
     }
   ]);
 
@@ -21,10 +20,8 @@ export default function Home() {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-
     const userMessage = { role: "user", content: input };
     const newMessages = [...messages, userMessage];
-
     setMessages(newMessages);
     setInput("");
     setLoading(true);
@@ -35,168 +32,101 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
       });
-
       const data = await res.json();
-
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: data.reply },
-      ]);
+      setMessages([...newMessages, { role: "assistant", content: data.reply }]);
     } catch (error) {
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: "⚠️ Something went wrong." },
-      ]);
+      setMessages([...newMessages, { role: "assistant", content: "⚠️ Something went wrong." }]);
     }
-
     setLoading(false);
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-[#0f172a] via-[#0b1120] to-black text-gray-100 font-sans">
+    // Fixed height for mobile to prevent address bar jumping
+    <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-[#0f172a] via-[#0b1120] to-black text-gray-100 font-sans overflow-hidden">
 
-      {/* Header */}
-      <header className="sticky top-0 z-10 backdrop-blur-xl bg-white/5 border-b border-white/10">
-        <div className="max-w-5xl mx-auto px-8 py-5 flex items-center justify-between">
-          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-            🤖 <span className="text-blue-500 drop-shadow-lg">BabarGPT</span>
+      {/* Header - Fluid height & padding */}
+      <header className="flex-none backdrop-blur-xl bg-white/5 border-b border-white/10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen-xl mx-auto py-4 md:py-6 flex items-center justify-between">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-2">
+            🤖 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">BabarGPT</span>
           </h1>
-          <span className="text-sm text-gray-400 tracking-wide">
-            Modern AI Experience
-          </span>
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span className="text-xs text-gray-400 uppercase tracking-widest">v2.0 Live</span>
+          </div>
         </div>
       </header>
 
-      {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-8 py-12 space-y-10">
-
+      {/* Chat Area - Uses 100% width on mobile, 80% on tablet, 60% on desktop */}
+      <main className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800">
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-6 space-y-6">
           {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                msg.role === "user" ? "justify-end" : "justify-start"
-              } animate-fadeIn`}
-            >
-              <div
-                className={`max-w-3xl px-8 py-6 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.01] whitespace-pre-wrap leading-8 text-[17px] ${
-                  msg.role === "user"
-                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-br-none"
-                    : "bg-white/10 backdrop-blur-xl border border-white/10 rounded-bl-none"
-                }`}
-              >
+            <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fadeIn`}>
+              <div className={`
+                relative px-4 py-3 sm:px-6 sm:py-4 rounded-2xl shadow-xl transition-all
+                text-[15px] sm:text-[16px] md:text-[17px] leading-relaxed
+                ${msg.role === "user" 
+                  ? "bg-blue-600 text-white rounded-br-none ml-12 sm:ml-24" 
+                  : "bg-white/10 backdrop-blur-md border border-white/10 rounded-bl-none mr-12 sm:mr-24"}
+                w-fit max-w-full
+              `}>
                 {msg.role === "assistant" ? (
                   <ReactMarkdown
                     components={{
-                      h1: ({ children }) => (
-                        <h1 className="text-2xl font-bold mt-5 mb-3 text-blue-400">
-                          {children}
-                        </h1>
-                      ),
-                      h2: ({ children }) => (
-                        <h2 className="text-xl font-semibold mt-4 mb-2 text-blue-300">
-                          {children}
-                        </h2>
-                      ),
-                      p: ({ children }) => (
-                        <p className="mb-4 text-gray-200 leading-8 text-[17px]">
-                          {children}
-                        </p>
-                      ),
-                      li: ({ children }) => (
-                        <li className="ml-6 list-disc mb-2 text-gray-300 text-[16px]">
-                          {children}
-                        </li>
-                      ),
-                      strong: ({ children }) => (
-                        <strong className="text-white font-semibold">
-                          {children}
-                        </strong>
-                      ),
+                      h2: ({ children }) => <h2 className="text-lg font-bold text-blue-300 my-2">{children}</h2>,
+                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      li: ({ children }) => <li className="ml-4 list-disc opacity-90">{children}</li>,
                     }}
                   >
                     {msg.content}
                   </ReactMarkdown>
-                ) : (
-                  msg.content
-                )}
+                ) : msg.content}
               </div>
             </div>
           ))}
-
+          
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-white/10 px-8 py-5 rounded-3xl border border-white/10 flex items-center gap-3 shadow-xl">
-                <span className="text-gray-300 text-lg font-medium">
-                  Thinking
-                </span>
-                <div className="flex gap-2">
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
+              <div className="bg-white/5 px-4 py-3 rounded-2xl border border-white/10 flex items-center gap-2">
+                <div className="flex gap-1">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                 </div>
               </div>
             </div>
           )}
-
           <div ref={chatEndRef} />
         </div>
-      </div>
+      </main>
 
-      {/* Input */}
-      <div className="border-t border-white/10 backdrop-blur-xl bg-white/5">
-        <div className="max-w-5xl mx-auto px-8 py-6 flex gap-4 items-center">
-
+      {/* Input Area - Floating style on mobile, docked on desktop */}
+      <footer className="p-3 sm:p-6 bg-transparent border-t border-white/5">
+        <div className="max-w-4xl mx-auto relative flex items-center gap-2">
           <input
-            className="flex-1 px-6 py-4 text-lg rounded-2xl bg-white/10 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-200 placeholder-gray-400"
+            className="w-full pl-4 pr-14 py-3 sm:py-4 bg-white/10 border border-white/10 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm sm:text-base placeholder:text-gray-500"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
+            placeholder="Ask BabarGPT anything..."
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           />
-
           <button
             onClick={sendMessage}
-            className="px-7 py-4 text-lg rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 hover:scale-105 active:scale-95 transition-all duration-200 font-semibold shadow-2xl flex items-center gap-2"
+            disabled={loading}
+            className="absolute right-1.5 sm:right-2 p-2 sm:p-3 bg-blue-600 hover:bg-blue-500 rounded-lg sm:rounded-xl transition-all active:scale-95 disabled:opacity-50"
           >
-            Send
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </button>
-
         </div>
-      </div>
+        {/* Safety padding for iPhones with Home Indicator */}
+        <div className="h-[env(safe-area-inset-bottom)]"></div>
+      </footer>
 
-      {/* Animations */}
       <style jsx>{`
-        .animate-fadeIn {
-          animation: fadeIn 0.4s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .dot {
-          width: 8px;
-          height: 8px;
-          background: #60a5fa;
-          border-radius: 50%;
-          animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-          0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
-          40% { transform: scale(1); opacity: 1; }
-        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
